@@ -21,6 +21,8 @@ Compiled: Ubuntu/gcc
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
+#include <sys/types.h>
 
 /*Function declarations*/
 /*Basic setup function*/
