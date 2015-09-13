@@ -36,19 +36,29 @@ void my_prompt(){
 
 }
 /*Executes external commands like ls, echo*/
-void my_execute(char **cmd){		// for instance cmd[]={"/bin/ls", "-l", "-a", NULL}
+void my_execute(char **cmd){		// for instance char* cmd[4]={"/bin/ls", "-l", "-a", NULL}
 	pid_t pid;
 	if( pid = fork() == 0)
 	{
 		if( execv( cmd[0],cmd) < 0)
-    	{
+    		{
       		perror("execv error ");
       		exit(1);
-    	}
+    		}
 	}
 	else
 		waitpid(pid, NULL, 0);
-		
+}
+
+void Exit(char **cmd)	// For built-in command "exit"
+{
+	if ( strcmp( cmd[0], "exit") == 0 || strcmp( cmd[0], "Exit") == 0)
+	{
+		printf("Exiting shell...\n\n(shell terminates)\n");
+		exit(0);
+	}
+}
+
 /*Cleans up dynamically allocated resources*/
 void my_clean(){
 
