@@ -35,11 +35,20 @@ void my_prompt(){
 
 
 }
-/*Executes*/
-void my_execute(char **cmd){
-
-
-}
+/*Executes external commands like ls, echo*/
+void my_execute(char **cmd){		// for instance cmd[]={"/bin/ls", "-l", "-a", NULL}
+	pid_t pid;
+	if( pid = fork() == 0)
+	{
+		if( execv( cmd[0],cmd) < 0)
+    	{
+      		perror("execv error ");
+      		exit(1);
+    	}
+	}
+	else
+		waitpid(pid, NULL, 0);
+		
 /*Cleans up dynamically allocated resources*/
 void my_clean(){
 
