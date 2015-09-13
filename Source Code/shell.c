@@ -50,7 +50,7 @@ void my_execute(char **cmd){		// for instance char* cmd[4]={"/bin/ls", "-l", "-a
 		waitpid(pid, NULL, 0);
 }
 
-void Exit(char **cmd)	// For built-in command "exit"
+void Exit(char **cmd)	// For built-in command "exit". Just call it then quit shell
 {
 	if ( strcmp( cmd[0], "exit") == 0 || strcmp( cmd[0], "Exit") == 0)
 	{
