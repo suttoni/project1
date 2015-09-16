@@ -59,6 +59,38 @@ void Exit(char **cmd)	// For built-in command "exit". Just call it then quit she
 	}
 }
 
+void Echo(char **cmd)	// For built-in "echo". could add if(cmd[0] =="echo") if needed.
+{
+	int i = 1;
+	
+	while( cmd[i] != NULL )
+	{
+		if( cmd[i][0] != '$' )	//if not requiring an EnvVar, just echo it.
+			printf("%s ", cmd[i]);
+		else				// if an EnvVar
+		{
+			char newargu[ strlen(cmd[i])];	// char array to remove '$'
+			char* p1 = &(cmd[i][1]);	
+			char* p2 = newargu;
+			while( *p1 != '\0' ){	// copy except '$'
+				*p2 = *p1;
+				p1++;	p2++;
+			}
+			*p2 = *p1;	//copy NULL to newargu end.
+			
+			
+			char* env;
+			if( env = getenv( newargu ) )	// EnvVar is there
+				printf("%s ", env);
+			else					// requiring undefined variable
+				printf("(%s: Undefined variable) ", newargu);
+		}
+		i++;
+	}
+	printf("\n");
+}
+
+
 /*Cleans up dynamically allocated resources*/
 void my_clean(){
 
