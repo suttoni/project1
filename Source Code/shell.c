@@ -32,7 +32,13 @@ void my_setup(){
 }
 /*Prompt for the user*/
 void my_prompt(){
-
+    char host[128];
+    char currentWorkingDirectory[1024];
+    
+    gethostname(host, sizeof host);
+    getcwd(currentWorkingDirectory, sizeof currentWorkingDirectory);
+    
+    printf("%s@%s:%s $", getlogin(), host, currentWorkingDirectory);
 
 }
 /*Executes external commands like ls, echo*/
