@@ -23,6 +23,8 @@ Compiled: Ubuntu/gcc
 #include <ctype.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <fcntl.h>
+#include <stdbool.h>
 
 /*Function declarations*/
 /*Basic setup function*/
@@ -94,6 +96,74 @@ void Echo(char **cmd)	// For built-in "echo". could add if(cmd[0] =="echo") if n
 		i++;
 	}
 	printf("\n");
+}
+
+bool is_iored(char** cmd) // check if right format for iored
+{
+	if( strcmp(cmd[0],">") == 0 || strcmp(cmd[0],"<") == 0) // if begin with <>, fail.
+		return false;
+	else 
+	{
+		int i = 0;
+		while( cmd[i] != NULL ) i++;	// for cmd XXX XXX > NULL case, fail
+		if( strcmp(cmd[i-1], ">")==0 || strcmp(cmd[i-1], "<")==0 )
+			return false;
+		else 
+			return true;
+	}
+}
+
+
+void output_red(char** cmd)	//set up fd for output redirection
+{
+	if( is_iored(cmd))
+	{
+		int k = 0;
+		while( cmd[k] != NULL ) k++; // k->cmd.end(). find end of cmd.
+		char filename[strlen(cmd[k-1])];
+		if( strcpy( filename, cmd[k-1]) == NULL)
+		{
+			printf("strcpy filename failed!\n");
+			exit(1);
+		}
+		
+		char path[256];
+		strcpy( path, getenv("PWD"));
+		strcat(path, "/");
+		strcat(path, filename);		// make char[] path 
+		
+		int fd = open( path, O_RDWR|O_CREAT|O_TRUNC);
+		
+		//if(fd != 0) printf("sfsg\n");
+		
+		pid_t fpid = fork();
+		if (fpid < 0)
+		{
+			perror("io fork failed!\n");
+			exit(1);
+		}
+		if( fpid == 0 ) // child
+		{
+			close(STDOUT_FILENO);
+			dup(fd);
+			close(fd);
+			/*
+			
+				execute other commands here
+			
+			*/
+		//	Echo(cmd); // my example run
+			_exit(0); 	//better not use exit(). buffer issue. look it up.
+			
+		}
+		else{
+			close(fd);
+			waitpid(fpid, NULL, 0);
+		}
+	}
+	else
+		printf("Undefined cmd format!\n"); //if wrong io format
+	
 }
 
 
