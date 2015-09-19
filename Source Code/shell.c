@@ -99,7 +99,7 @@ void Echo(char **cmd)	// For built-in "echo". could add if(cmd[0] =="echo") if n
 }
 
 bool is_iored(char** cmd) // check if right format for iored
-{
+{						// call by output_red and input_red
 	if( strcmp(cmd[0],">") == 0 || strcmp(cmd[0],"<") == 0) // if begin with <>, fail.
 		return false;
 	else 
@@ -134,8 +134,6 @@ void output_red(char** cmd)	//set up fd for output redirection
 		
 		int fd = open( path, O_RDWR|O_CREAT|O_TRUNC);
 		
-		//if(fd != 0) printf("sfsg\n");
-		
 		pid_t fpid = fork();
 		if (fpid < 0)
 		{
@@ -166,6 +164,63 @@ void output_red(char** cmd)	//set up fd for output redirection
 	
 }
 
+void input_red(char** cmd)		// for input redirection
+{
+	if( is_iored(cmd))
+	{
+		int k = 0;
+		while( cmd[k] != NULL ) k++; // k->cmd.end()
+		char filename[strlen(cmd[k-1])];
+		if( strcpy( filename, cmd[k-1]) == NULL)
+		{
+			printf("strcpy filename failed!\n");
+			exit(1);
+		}
+		
+		char path[256];
+		strcpy( path, getenv("PWD"));
+		strcat(path, "/");
+		strcat(path, filename);		//making path/filename
+		
+		char command[10];
+		if( strcpy(command, cmd[0]) )
+		{
+			printf("strcpy command failed!\n");
+			exit(1);
+		}							//making command(echo, ls,,,)
+		
+		int fd = open( path, O_RDONLY);
+		if(fd == 0) { printf("open file failed!\n"); return;} 
+								// check availability of file
+		pid_t fpid = fork();
+		if (fpid < 0)
+		{
+			perror("io fork failed!\n");
+			exit(1);
+		}
+		if( fpid == 0 ) // child
+		{
+			close(STDIN_FILENO);
+			dup(fd);
+			close(fd);
+			
+			// t_line = my_read() from file!
+			// t_cmd = my_parse() from t_line I guess.
+			
+			// check, judge and execute t_cmd(argu from file).
+			
+			_exit(0);
+		}
+		else{			// parent
+			close(fd);
+			waitpid(fpid, NULL, 0);
+		}
+		
+		
+	}
+	else
+		printf("Undefined cmd format!\n");
+}
 
 /*Cleans up dynamically allocated resources*/
 void my_clean(){
