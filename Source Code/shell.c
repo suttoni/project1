@@ -17,16 +17,6 @@ int main(){
 	char **cmd;
 	
 	while(1){
-		//Setup
-		//Print Prompt
-		//Read Input
-		//Transform input
-		//Match against patterns
-		//Execute command
-		//Print results
-		//Cleanup
-		//my_setup();
-
 		my_prompt();
 		line = my_read();
 		cmd = my_parse(line);
