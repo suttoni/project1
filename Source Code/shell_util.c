@@ -102,9 +102,15 @@ char **my_parse(char *line){
 /* for instance char* cmd[4]={"/bin/ls", "-l", "-a", NULL} */
 void my_execute(char **cmd){		
 	pid_t pid;
+	char newString[256];
+	char binString[] = "/bin/";
 
-	if(pid = fork() == 0){
-		if( execv(cmd[0], cmd) < 0){
+	strcat(newString, binString);
+	strcat(newString, cmd[0]);
+
+	pid = fork();
+	if(pid == 0){
+		if( execv(newString, cmd) < 0){
       		perror("execv error ");
       		exit(1);
     		}

@@ -33,14 +33,16 @@ int main(){
 		//Execute command
 		//Print results
 		//Cleanup
+		//my_setup();
 
-		
-		my_setup();
 		my_prompt();
 		line = my_read();
 		cmd = my_parse(line);
 		my_execute(cmd);
-		my_clean();
+		//my_clean();
+
+		free(line);
+		free(cmd);
 	}
 
 	return 0;
