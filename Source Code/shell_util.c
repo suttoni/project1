@@ -42,13 +42,13 @@ void my_prompt(){
 
 /* Reads data from standard input */
 char *my_read(){
-	/* Variable declarations for buffer_size and input */
-	size_t buffer_size = 0;
-	char *input = NULL;
-
-	/* Using getline to retrieve input from stdin */
-	getline(&input, &buffer_size, stdin);
-	return input;
+	/* Begin by creating a buffer variable for user input
+	   with a arbitrary block size of 1024 */
+	char *line;
+	size_t bufsize = 0; // have getline allocate a buffer for us
+	getline(&line, &bufsize, stdin);
+	
+	return line;
 }
 
 /* Parses the line provided by my_read */
