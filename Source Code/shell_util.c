@@ -160,17 +160,17 @@ void Echo(char **cmd){
 }
 
 /* For built-in CD command */
-int cd(char **arg){
+int cd(char **cmd){
 	/* Error checking to make sure there is a path to change directory */
 	int ret;
 
 	/* If no argument is given, cd to home */
-	if (arg[1] == NULL){
+	if (cmd[1] == NULL){
 		ret = chdir(getenv("HOME"));
 	}
 
 	else{
-		ret = chdir(arg[1]);
+		ret = chdir(cmd[1]);
 	}
 
 	return ret;
@@ -185,7 +185,7 @@ bool is_iored(char** cmd){
 	else{
 		int i = 0;
 		while( cmd[i] != NULL ) i++;						// for cmd XXX XXX > NULL case, fail
-		if( strcmp(cmd[i-1], ">")==0 || strcmp(cmd[i-1], "<") == 0 )
+		if( strcmp(cmd[i-1], ">") == 0 || strcmp(cmd[i-1], "<") == 0 )
 			return false;
 		else 
 			return true;
@@ -221,11 +221,7 @@ void output_red(char** cmd){
 			close(STDOUT_FILENO);
 			dup(fd);
 			close(fd);
-			/*
-			
-				execute other commands here
-			
-			*/
+			check_command(cmd);	
 		//	Echo(cmd); // my example run
 			_exit(0); 	//better not use exit(). buffer issue. look it up.
 			
@@ -294,6 +290,16 @@ void input_red(char** cmd){
 
 	else
 		printf("Undefined cmd format!\n");
+}
+
+void check_command(char **cmd){
+
+	if (strcmp(cmd[0], "echo") == 0)
+		Echo(cmd);
+	else if (strcmp(cmd[0], "exit") == 0)
+		Exit(cmd);
+	else 
+		my_execute(cmd);
 }
 
 /* Cleans up dynamically allocated resources */

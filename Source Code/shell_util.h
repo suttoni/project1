@@ -17,14 +17,16 @@ void my_prompt();
 void my_execute(char **cmd);
 void my_execute(char **cmd);
 void Echo(char **cmd);
-void output_red(char** cmd);
-void input_red(char** cmd);
+void Exit(char **cmd);
+void output_red(char **cmd);
+void input_red(char **cmd);
+void check_command(char **cmd);
 void my_clean();
 
 char *my_read();
 char **my_parse(char *line);
 
-bool is_iored(char** cmd);
+bool is_iored(char **cmd);
 
 int cd(char **args);
 #endif

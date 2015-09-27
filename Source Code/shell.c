@@ -38,9 +38,7 @@ int main(){
 		my_prompt();
 		line = my_read();
 		cmd = my_parse(line);
-		my_execute(cmd);
-		//my_clean();
-
+		check_command(cmd);
 		free(line);
 		free(cmd);
 	}
