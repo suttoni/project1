@@ -1,78 +1,10 @@
-Report:
----------------------------------------------------------
-Team: Satisfries
-Members: Yilin Wang, Sai Gunasegaran, Ian Sutton
-FSUIDs: iss13, sg13z, yw12c
----------------------------------------------------------
-Problem Statement: 
-	Design and implement a basic shell interface that supports input/output redirection, pipes, background 
-	processing, and a series of built in functions as specified below. The shell should be robust (e.g. it should not crash under any circumstance beyond machine failure). The required features should adhere to the operational semantics of the bash shell. 
+Readme
+-------------------------------------------------
+Completed using: Ubuntu Linux 3.16.0-49-generic 
+Tested with: valgrind --leak-check=yes ./shell
 
----------------------------------------------------------
+To build:
+	$> make
 
-Assumptions:
-	- No more than 255 characters would be used for input.
-	- Redirection and piping would not be mixed within a single command.
-	- We can treat commands without whitespace (e.g cdProject1) as a single command.
-
----------------------------------------------------------
-
-System calls:
-	- <stdio.h>: printf, output, etc.
-	- <stdlib.h>: fork(), execv(), etc.
-	- <string.h>: getline(), strcmp(), strcat(), etc.
-	- <sys/types.h>: O_CREAT, O_TRUNC, O_RDWR, etc.
-	- <stdbool.h>: boolean types.
-
----------------------------------------------------------
-
-Problems:
-	- We first encountered major problems with my_parse, but
-	  those issues have been fixed.
-	- Next, we ran into an issue with my_execute, however we fixed that
-	  by initially using "execvp" and upon further reading we discovered that was not allowed, and we were limited to only using "execv" by adding 
-	  			char newString[256];
-				char binString[] = "/bin/";
-
-				strcat(newString, binString);
-				strcat(newString, cmd[0]);
-
-	  to our function which solved the issue.
-	- We weren't able to work on resolving the pathnames.
-	- We were unable to implement piping.
-
----------------------------------------------------------
-
-Division of Labor:
-
-	Ian Sutton:
-		- my_read().
-		- my_parse().
-		- shell.c
-		- cd().
-		- my_clean().
-		- check_command().
-	Sai Gunasegaran:
-		- my_prompt().
-		- makefile.
-		- Readme.
-		- Report.
-	Yilin Wang:
-		- my_execute().
-		- Exit().
-		- Echo().
-		- is_iored().
-		- output_red().
-		- input_red().
-
----------------------------------------------------------
-
-Known bugs:
-	
-	- While running Valgrind, we have the following errors
-	   Conditional jump or move depends on uninitialised value(s)
-	   Address 0x0 is not stack'd, malloc'd or (recently) free'd
-
-	- After finishing with Valgrind, we do have a segmentation fault so we have issues with our memory management.
-
-	
+To clean:
+	$> make clean
