@@ -23,11 +23,6 @@
 //Define delimiter macro for parse function
 #define DELIM " \t\r\n\a"
 
-/* Basic setup function */
-void my_setup(){
-
-
-}
 /* Prompt for the user */
 void my_prompt(){
     char host[128];
