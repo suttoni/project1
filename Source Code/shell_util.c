@@ -37,11 +37,10 @@ void my_prompt(){
 
 /* Reads data from standard input */
 char* my_read(){
-	/* Begin by creating a buffer variable for user input
-	   with a arbitrary block size of 1024 */
+	/* Simple function using getline to read from stdin */
+	size_t buffer_size = 0; 
 	char *line;
-	size_t bufsize = 0; // have getline allocate a buffer for us
-	getline(&line, &bufsize, stdin);
+	getline(&line, &buffer_size, stdin);
 	
 	return line;
 }
@@ -49,7 +48,7 @@ char* my_read(){
 /* Parses the line provided by my_read */
 char **my_parse(char *line){
 	/* Begin by creating a buffer variable for user input
-	   with a arbitrary block size of 1024 */
+	   with a arbitrary block size of 64 */
 	int buffer_size = 64;
 	int i = 0;	
 
@@ -57,12 +56,6 @@ char **my_parse(char *line){
 	char  *token;
 	char **token_storage = (char**)calloc(buffer_size, sizeof(char*));
 	
-	/* Standard error checking */
-	if(!token_storage){
-		fprintf(stderr, "Allocation Error in my_parse function\n");
-		exit(EXIT_FAILURE);
-	}
-
 	token = strtok(line, DELIM);
 
 	while(token != NULL){
@@ -72,14 +65,14 @@ char **my_parse(char *line){
 
 		/* If the ith position in token_storage is larger 
 		   than the buffer_size, reallocate memory */
-		if(i >= buffer_size){
+		if(buffer_size < i){
 			/* Double buffer_size */
-			buffer_size += buffer_size;
+			buffer_size = buffer_size * 2;
 
 			/* reallocate token_storage to support new size */
-			token_storage = realloc(token_storage, sizeof(char*) * buffer_size);
+			token_storage = (char**)realloc(token_storage, sizeof(char*) * buffer_size);
 
-			/* Again, check for allocation error */
+			/* check for allocation error */
 			if(!token_storage){
 				fprintf(stderr, "Allocation Error in my_parse function\n");
 				exit(EXIT_FAILURE);
