@@ -20,6 +20,9 @@
 #include <fcntl.h>
 #include <stdbool.h>
 
+//Define delimiter macro for parse function
+#define DELIM " \t\r\n\a"
+
 /* Basic setup function */
 void my_setup(){
 
@@ -39,20 +42,11 @@ void my_prompt(){
 
 /* Reads data from standard input */
 char *my_read(){
-	/* Begin by creating a buffer variable for user input
-	   with a arbitrary block size of 1024 */
+	/* Variable declarations for buffer_size and input */
 	size_t buffer_size = 0;
 	char *input = NULL;
 
-	/* Dyanmically allocated buffer for user input */
-	//char *buffer = (char*)calloc(buffer_size, sizeof(char));
-
-	/* Standard error checking
-	if (!buffer){
-		fprintf(stderr, "Allocation Error in my_read function\n");
-		exit(EXIT_FAILURE);
-	}*/
-
+	/* Using getline to retrieve input from stdin */
 	getline(&input, &buffer_size, stdin);
 	return input;
 }
@@ -60,14 +54,13 @@ char *my_read(){
 /* Parses the line provided by my_read */
 char **my_parse(char *line){
 	/* Begin by creating a buffer variable for user input
-	   with a arbitrary block size of 1024 */
+	   with a arbitrary buffer size of 64 */
 	int buffer_size = 64;
 	int i = 0;		
 
 	/* Dyanmically allocated buffer for user input */
-	char  *delim = " ";
 	char  *token;
-	char **token_storage = (char**)calloc(buffer_size, sizeof(char*));
+	char **token_storage = calloc(buffer_size, sizeof(char*));
 	
 
 	/* Standard error checking */
@@ -76,7 +69,8 @@ char **my_parse(char *line){
 		exit(EXIT_FAILURE);
 	}
 
-	token = strtok(line, delim);
+	/* Use strtok to separate line into tokens with delim */
+	token = strtok(line, DELIM);
 
 	while(token != NULL){
 
@@ -98,12 +92,12 @@ char **my_parse(char *line){
 				exit(EXIT_FAILURE);
 			}
 
-			token = strtok(NULL, delim);
+			token = strtok(NULL, DELIM);
 		}
-
-		token_storage[i] = NULL;
-		return token_storage;
 	}
+	
+	token_storage[i] = NULL;
+	return token_storage;
 }
 
 /* Executes external commands like ls, echo */
@@ -112,7 +106,7 @@ void my_execute(char **cmd){
 	pid_t pid;
 
 	if(pid = fork() == 0){
-		if( execv(cmd[0],cmd) < 0){
+		if( execv(cmd[0], cmd) < 0){
       		perror("execv error ");
       		exit(1);
     		}
@@ -159,6 +153,23 @@ void Echo(char **cmd){
 		i++;
 	}
 	printf("\n");
+}
+
+/* For built-in CD command */
+int cd(char **arg){
+	/* Error checking to make sure there is a path to change directory */
+	int ret;
+
+	/* If no argument is given, cd to home */
+	if (arg[1] == NULL){
+		ret = chdir(getenv("HOME"));
+	}
+
+	else{
+		ret = chdir(arg[1]);
+	}
+
+	return ret;
 }
 
 /* Check if right format for iored */
