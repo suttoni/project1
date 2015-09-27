@@ -41,7 +41,7 @@ void my_prompt(){
 
 
 /* Reads data from standard input */
-char *my_read(){
+char* my_read(){
 	/* Begin by creating a buffer variable for user input
 	   with a arbitrary block size of 1024 */
 	char *line;
@@ -54,22 +54,20 @@ char *my_read(){
 /* Parses the line provided by my_read */
 char **my_parse(char *line){
 	/* Begin by creating a buffer variable for user input
-	   with a arbitrary buffer size of 64 */
+	   with a arbitrary block size of 1024 */
 	int buffer_size = 64;
-	int i = 0;		
+	int i = 0;	
 
 	/* Dyanmically allocated buffer for user input */
 	char  *token;
-	char **token_storage = calloc(buffer_size, sizeof(char*));
+	char **token_storage = (char**)calloc(buffer_size, sizeof(char*));
 	
-
 	/* Standard error checking */
 	if(!token_storage){
 		fprintf(stderr, "Allocation Error in my_parse function\n");
 		exit(EXIT_FAILURE);
 	}
 
-	/* Use strtok to separate line into tokens with delim */
 	token = strtok(line, DELIM);
 
 	while(token != NULL){
@@ -92,10 +90,10 @@ char **my_parse(char *line){
 				exit(EXIT_FAILURE);
 			}
 
-			token = strtok(NULL, DELIM);
 		}
+
+		token = strtok(NULL, DELIM);
 	}
-	
 	token_storage[i] = NULL;
 	return token_storage;
 }
