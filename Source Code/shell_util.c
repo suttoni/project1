@@ -222,7 +222,6 @@ void output_red(char** cmd){
 			dup(fd);
 			close(fd);
 			check_command(cmd);	
-		//	Echo(cmd); // my example run
 			_exit(0); 	//better not use exit(). buffer issue. look it up.
 			
 		}
@@ -303,7 +302,7 @@ void check_command(char **cmd){
 }
 
 /* Cleans up dynamically allocated resources */
-void my_clean(){
-
-
+void my_clean(char *line, char **cmd){
+	free(line);
+	free(cmd);
 }

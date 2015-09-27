@@ -39,8 +39,7 @@ int main(){
 		line = my_read();
 		cmd = my_parse(line);
 		check_command(cmd);
-		free(line);
-		free(cmd);
+		my_clean(line, cmd);
 	}
 
 	return 0;

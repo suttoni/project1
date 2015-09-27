@@ -21,7 +21,7 @@ void Exit(char **cmd);
 void output_red(char **cmd);
 void input_red(char **cmd);
 void check_command(char **cmd);
-void my_clean();
+void my_clean(char *line, char **cmd);
 
 char *my_read();
 char **my_parse(char *line);
