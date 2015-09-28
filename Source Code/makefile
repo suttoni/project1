@@ -7,4 +7,4 @@ shell.x: shell_util.o
 	$(CC) shell.c shell_util.c -o shell.x
   
 clean:
-	rm *o shell.x
+	rm *o
