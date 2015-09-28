@@ -8,3 +8,7 @@ To build:
 
 To clean:
 	$> make clean
+To run:
+	$> shell.x
+
+Most of contents has been transferred to Report.
