@@ -306,7 +306,7 @@ void output_red(char** cmd){
 	}
 
 	else
-		printf("Undefined cmd format!\n"); 					//if wrong io format
+		printf("Undefined output_red cmd format!\n"); 					//if wrong io format
 }
 
 /* For input redirection */
