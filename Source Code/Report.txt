@@ -19,10 +19,11 @@ Assumptions:
 
 System calls:
 	- <stdio.h>: printf, output, etc.
-	- <stdlib.h>: fork(), execv(), etc.
+	- <stdlib.h>: calloc(), free(), etc.
 	- <string.h>: getline(), strcmp(), strcat(), etc.
 	- <sys/types.h>: O_CREAT, O_TRUNC, O_RDWR, etc.
 	- <stdbool.h>: boolean types.
+	- <unistd.h>: fork(), execv(), etc.
 
 ---------------------------------------------------------
 
@@ -39,7 +40,17 @@ Problems:
 
 	  to our function which solved the issue.
 	- We weren't able to work on resolving the pathnames.
-	- We were unable to implement piping.
+	- We were unable to implement piping, built-in limits and background process.
+---------------------------------------------------------
+
+Steps taken to solve problem:
+	- Experimented with real shell. Observed how some cmds(<,>,echo,etc.) works.
+	- Readed books and notes to understand how fork() and execv() works.
+	- Implemented fork() and execv().
+	- Implemented parsing.
+	- Implemented prompt, echo and exit.
+	- Implemented I/O redirection.
+	- Implemented etime.
 
 ---------------------------------------------------------
 
@@ -58,12 +69,13 @@ Division of Labor:
 		- Readme.
 		- Report.
 	Yilin Wang:
-		- my_execute().
-		- Exit().
-		- Echo().
-		- is_iored().
-		- output_red().
-		- input_red().
+		- my_execute() for executing external cmds.
+		- Exit() for exit cmd
+		- Echo() for echo cmd
+		- Etime() for etime cmd
+		- is_iored(). 
+		- output_red() for output redirection
+		- input_red() for input redirection
 
 ---------------------------------------------------------
 
@@ -75,4 +87,27 @@ Known bugs:
 
 	- After finishing with Valgrind, we do have a segmentation fault so we have issues with our memory management.
 
-	
+---------------------------------------------------------
+
+Log:
+09/28/15
+-	Project completed
+
+09/14/15 - 09/27/15
+-	Finish etime
+-	Debug and test.
+
+09/13/15
+-	Finish echo
+-	Finish I/O redirection
+-	Finish Parsing
+
+09/06/15
+-	Finish command exit.
+
+09/05/15
+-	Finish my_execute
+
+08/28/15
+-	Project assigned.
+
