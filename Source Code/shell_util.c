@@ -31,7 +31,7 @@ void my_prompt(){
     gethostname(host, sizeof host);
     getcwd(curr_working_directory, sizeof curr_working_directory);
     
-    printf("%s@%s:%s $", getlogin(), host, curr_working_directory);
+    printf("%s@%s:%s=> ", getlogin(), host, curr_working_directory);
 }
 
 
@@ -55,6 +55,13 @@ char **my_parse(char *line){
 	/* Dyanmically allocated buffer for user input */
 	char  *token;
 	char **token_storage = (char**)calloc(buffer_size, sizeof(char*));
+	
+	/* Standard error checking */
+	if(!token_storage){
+		fprintf(stderr, "Allocation Error in my_parse function\n");
+		exit(EXIT_FAILURE);
+	}
+
 	
 	token = strtok(line, DELIM);
 
@@ -86,6 +93,80 @@ char **my_parse(char *line){
 	return token_storage;
 }
 
+//Below is for etime
+int time_substract(struct timeval *result, struct timeval *begin,struct timeval *end)
+{							// To calculate time diff between two timeval struct.
+    if(begin->tv_sec > end->tv_sec)
+		return -1;
+    if((begin->tv_sec == end->tv_sec) && (begin->tv_usec > end->tv_usec))
+		return -2;
+
+    result->tv_sec = (end->tv_sec - begin->tv_sec);
+    result->tv_usec = (end->tv_usec - begin->tv_usec);
+
+    if(result->tv_usec < 0)
+    {
+        result->tv_sec--;
+        result->tv_usec += 1000000;
+    }
+    return 0;
+}
+
+char** Remove_first(char** cmd)
+{
+	int end = 0;
+	while( cmd[end] != NULL ) end++; 	// k->cmd.end(). find end of cmd.
+	int i = 1;
+	for(; i-1<end; i++)
+		cmd[i-1] = cmd[i];
+	
+	
+	return cmd;
+}
+
+
+double Etime(char** cmd)
+{
+	Remove_first(cmd); // remove "etime" in cmd
+		int i;
+		char *ifIR=NULL, *ifOR=NULL;
+		for(i=0; cmd[i]!=NULL;i++)
+		{
+			ifOR = strchr(cmd[i], '>');
+			if( ifOR!=NULL ) break;	// if cmd contains >
+		}
+		for(i=0; cmd[i]!=NULL;i++)
+		{
+			ifIR = strchr(cmd[i], '<');
+			if( ifIR!=NULL ) break;// if cmd contains <
+		}
+	
+
+	struct timeval start, finish, diff;
+	gettimeofday(&start, 0);
+	
+		if(cmd[0] != NULL)
+		{
+			if( ifOR!=NULL )
+				output_red(cmd);
+			else if( ifIR!=NULL )
+				input_red(cmd);
+			else if((strcmp(cmd[0], "echo") == 0)||(strcmp(cmd[0], "exit") == 0))
+				check_command(cmd);
+			else
+				my_execute(cmd);
+		}
+	
+	gettimeofday(&finish, 0);
+	time_substract(&diff, &start, &finish);
+	double duration = (double)diff.tv_sec + ((double)diff.tv_usec/1000000.0);
+	printf("Elapsed Time: %.9fs\n",duration);
+	
+	return duration;
+
+}
+
+
 /* Executes external commands like ls, echo */
 /* for instance char* cmd[4]={"/bin/ls", "-l", "-a", NULL} */
 void my_execute(char **cmd){		
@@ -93,7 +174,7 @@ void my_execute(char **cmd){
 	char newString[256];
 	char binString[] = "/bin/";
 
-	strcat(newString, binString);
+	strcpy(newString, binString);
 	strcat(newString, cmd[0]);
 
 	pid = fork();
@@ -209,6 +290,10 @@ void output_red(char** cmd){
 			close(STDOUT_FILENO);
 			dup(fd);
 			close(fd);
+			int end=0;
+			while( cmd[end]!=NULL ) end++;
+			cmd[end-2] = cmd[end];	// remove "> file" in end of cmd! Otherwise as argu in ls! and shown in file!
+
 			check_command(cmd);	
 			_exit(0); 	//better not use exit(). buffer issue. look it up.
 			
@@ -241,42 +326,51 @@ void input_red(char** cmd){
 		strcat( path, "/" );
 		strcat( path, filename );							//making path/filename
 		
-		char command[10];
-		if( strcpy(command, cmd[0]) ){
-			printf("strcpy command failed!\n");
-			exit(1);
-		}													//making command(echo, ls,,,)
-		
-		int fd = open( path, O_RDONLY);
-		if(fd == 0) { printf("open file failed!\n"); return;} 
-															// check availability of file
-		pid_t fpid = fork();
-		if (fpid < 0){
-			perror("io fork failed!\n");
-			exit(1);
-		}
+		char command[20];
+		if( strcpy(command, cmd[0]) )
+		{
+															//making command(echo, ls,,,)
+			int fd = open( path, O_RDONLY);
+			if(fd == 0) { printf("open file failed!\n"); return;} 
+																// check availability of file
+			pid_t fpid = fork();
+			if (fpid < 0){
+				perror("io fork failed!\n");
+				exit(1);
+			}
 
-		if( fpid == 0 ){ 									// child
-			close(STDIN_FILENO);
-			dup(fd);
-			close(fd);
-			
-			// t_line = my_read() from file!
-			// t_cmd = my_parse() from t_line I guess.
-			
-			// check, judge and execute t_cmd(argu from file).
-			
-			_exit(0);
-		}
+			if( fpid == 0 ){ 									// child
+				close(STDIN_FILENO);
+				dup(fd);
+				close(fd);
+				
+				free(cmd);
+				char *line;
+				char *newcmd[32], **argu; //newcmd could hold 31 argus + 1 cmd
+				line = my_read();
+				argu = my_parse(line); //redo parsing from file! to get argus.
+				newcmd[0] = command;
+				int z;
+				for(z=0; argu[z]!=NULL ;z++)
+					newcmd[z+1] = argu[z];
+				newcmd[z+1] = argu[z]; //copy argu provided from file to newcmd
+				
+				check_command(newcmd);
+				
+				_exit(0);
+			}
 
-		else{	 											// parent
-			close(fd);
-			waitpid(fpid, NULL, 0);
-		}				
+			else{	 							
+				waitpid(fpid, NULL, 0);
+			}				
+		}
+		else
+		{	printf("strcpy command copy failed!\n");
+			exit(1);}
+			
 	}
-
 	else
-		printf("Undefined cmd format!\n");
+		printf("Undefined input_red cmd format!\n");
 }
 
 void check_command(char **cmd){
